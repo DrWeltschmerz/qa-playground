@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "QA Showcase API (AI)",
+    "version": "0.1.0"
+  },
+  "servers": [
+    { "url": "http://localhost:8080" }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ai/complete": {
+      "post": {
+        "summary": "Model completion",
+        "security": [
+          { "bearerAuth": [] },
+          { "apiKeyAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt", "model"],
+                "properties": {
+                  "prompt": { "type": "string" },
+                  "model": { "type": "string", "enum": ["adapter-a", "adapter-b"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "model": { "type": "string" },
+                    "completion": { "type": "string" },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "prompt_tokens": { "type": "integer" },
+                        "completion_tokens": { "type": "integer" },
+                        "total_tokens": { "type": "integer" }
+                      }
+                    },
+                    "traceId": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" },
+      "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "x-api-key" }
+    }
+  }
+}

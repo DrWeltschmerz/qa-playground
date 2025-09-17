@@ -1,0 +1,255 @@
+tmp-users-adapter-gin/
+
+# ===== GO =====
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Project-specific Go binaries
+api-gateway/api-gateway
+services/adapter-a/adapter-a
+services/adapter-b/adapter-b
+tmp-users-adapter-gin/tmp-users-adapter-gin
+
+# Go module cache
+/go/pkg/mod/
+
+# ===== NODE.JS / NPM =====
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# ===== PLAYWRIGHT =====
+# Test results
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Screenshots and videos from failed tests
+test-results*/
+
+# Playwright browsers (optional - uncomment if you want to exclude downloaded browsers)
+# /ms-playwright/
+
+# Playwright traces
+test-results/
+playwright-report/
+blob-report/
+
+# ===== ENVIRONMENT & CONFIG =====
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Configuration files that might contain secrets
+config.local.json
+.config
+
+# ===== IDE & EDITORS =====
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+*** REMOVED: JetBrains IDEs section ***
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+.vimrc.local
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# ===== OS FILES =====
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===== BUILD & DISTRIBUTION =====
+# Build outputs
+dist/
+build/
+out/
+target/
+
+# ===== LOGS =====
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ===== TEMPORARY & CACHE =====
+# Temporary directories
+tmp/
+temp/
+.tmp/
+.cache/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ===== SECURITY & CREDENTIALS =====
+# API keys and secrets
+.env.secret
+.env.production
+secrets.json
+credentials.json
+*.pem
+*.key
+*.crt
+*.csr
+
+# ===== DOCKER =====
+# Docker override files
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# ===== MONITORING & PROFILING =====
+# Profiling data
+*.prof
+*.pprof
+
+# Memory dumps
+*.hprof
+heapdump
+
+# ===== MISC =====
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml

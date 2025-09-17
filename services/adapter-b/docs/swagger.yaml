@@ -1,0 +1,537 @@
+basePath: /
+definitions:
+  main.ChatChoice:
+    properties:
+      finish_reason:
+        example: stop
+        type: string
+      index:
+        example: 0
+        type: integer
+      message:
+        $ref: '#/definitions/main.ChatMessage'
+    type: object
+  main.ChatMessage:
+    properties:
+      content:
+        example: Hello, how are you?
+        type: string
+      role:
+        description: user, assistant, system
+        example: user
+        type: string
+    type: object
+  main.ChatRequest:
+    properties:
+      max_tokens:
+        example: 150
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/main.ChatMessage'
+        type: array
+      model:
+        example: adapter-b
+        type: string
+      stream:
+        example: false
+        type: boolean
+      temperature:
+        example: 0.7
+        type: number
+    type: object
+  main.ChatResponse:
+    properties:
+      choices:
+        items:
+          $ref: '#/definitions/main.ChatChoice'
+        type: array
+      created:
+        example: 1694876543
+        type: integer
+      id:
+        example: chat-123
+        type: string
+      model:
+        example: adapter-b
+        type: string
+      object:
+        example: chat.completion
+        type: string
+      usage:
+        $ref: '#/definitions/main.UsageInfo'
+    type: object
+  main.LoadBalancerInfo:
+    properties:
+      active_nodes:
+        example: 4
+        type: integer
+      failover_enabled:
+        example: true
+        type: boolean
+      load_distribution:
+        additionalProperties:
+          type: integer
+        type: object
+      node_health:
+        additionalProperties:
+          type: string
+        type: object
+      total_nodes:
+        example: 5
+        type: integer
+    type: object
+  main.ResponseMetadata:
+    properties:
+      confidence:
+        example: 0.92
+        type: number
+      content_filtered:
+        example: false
+        type: boolean
+      custom_data:
+        additionalProperties: true
+        type: object
+      finish_reason:
+        example: stop
+        type: string
+      model_version:
+        example: 2.1.0
+        type: string
+      processing_time:
+        example: 245ms
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  main.UsageInfo:
+    properties:
+      completion_tokens:
+        example: 35
+        type: integer
+      prompt_tokens:
+        example: 15
+        type: integer
+      total_tokens:
+        example: 50
+        type: integer
+    type: object
+  main.completeRequest:
+    properties:
+      max_tokens:
+        example: 200
+        type: integer
+      model:
+        example: adapter-b
+        type: string
+      prompt:
+        example: Hello world
+        type: string
+      stop_sequences:
+        items:
+          type: string
+        type: array
+      stream:
+        example: false
+        type: boolean
+      system_prompt:
+        example: You are a helpful assistant
+        type: string
+      temperature:
+        example: 0.8
+        type: number
+      top_p:
+        example: 0.95
+        type: number
+    type: object
+  main.completeResponse:
+    properties:
+      completion:
+        example: 'B: Hello world response'
+        type: string
+      created_at:
+        example: "2025-09-16T10:30:00Z"
+        type: string
+      metadata:
+        $ref: '#/definitions/main.ResponseMetadata'
+      model:
+        example: adapter-b
+        type: string
+      request_id:
+        example: req-123
+        type: string
+      usage:
+        $ref: '#/definitions/main.UsageInfo'
+    type: object
+info:
+  contact: {}
+  description: Advanced AI completion service adapter B with streaming, chat, and
+    specialized processing
+  title: AI Adapter B API
+  version: 2.1.0
+paths:
+  /analyze/entities:
+    post:
+      consumes:
+      - application/json
+      description: Extract named entities from text
+      parameters:
+      - description: Text to analyze
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            text:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              entities:
+                type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Extract entities
+      tags:
+      - analysis
+  /analyze/sentiment:
+    post:
+      consumes:
+      - application/json
+      description: Analyze sentiment of the provided text
+      parameters:
+      - description: Text to analyze
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            text:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              confidence:
+                type: number
+              scores:
+                type: object
+              sentiment:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Analyze sentiment
+      tags:
+      - analysis
+  /cache/stats:
+    get:
+      description: Get cache performance statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              cache_stats:
+                type: object
+            type: object
+      summary: Get cache statistics
+      tags:
+      - cache
+  /chat/completions:
+    post:
+      consumes:
+      - application/json
+      description: Generate chat completion with message history
+      parameters:
+      - description: Chat request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Chat completion
+      tags:
+      - chat
+  /classify:
+    post:
+      consumes:
+      - application/json
+      description: Classify text into predefined categories
+      parameters:
+      - description: Classification request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            categories:
+              type: array
+            text:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              all_scores:
+                type: object
+              category:
+                type: string
+              confidence:
+                type: number
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Classify text
+      tags:
+      - analysis
+  /complete:
+    post:
+      consumes:
+      - application/json
+      description: Generate AI text completion using adapter B with advanced options
+      parameters:
+      - description: Completion request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.completeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.completeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate text completion
+      tags:
+      - completion
+  /completions/stream:
+    post:
+      consumes:
+      - application/json
+      description: Generate streaming text completion
+      parameters:
+      - description: Streaming completion request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.completeRequest'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Server-sent events stream
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Stream completion
+      tags:
+      - streaming
+  /health:
+    get:
+      description: Get basic health status of adapter B
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - monitoring
+  /load-balancer/status:
+    get:
+      description: Get current load balancer status and node health
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoadBalancerInfo'
+      summary: Get load balancer status
+      tags:
+      - load-balancing
+  /models/available:
+    get:
+      description: Get list of all available AI models
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              models:
+                type: array
+            type: object
+      summary: Get available models
+      tags:
+      - models
+  /stream/sessions:
+    get:
+      description: Get list of active streaming sessions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              active_count:
+                type: number
+              sessions:
+                type: array
+            type: object
+      summary: Get streaming sessions
+      tags:
+      - streaming
+  /summarize:
+    post:
+      consumes:
+      - application/json
+      description: Generate a summary of the provided text
+      parameters:
+      - description: Summarization request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            max_length:
+              type: number
+            style:
+              type: string
+            text:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              compression_ratio:
+                type: number
+              summary:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Summarize text
+      tags:
+      - processing
+  /translate:
+    post:
+      consumes:
+      - application/json
+      description: Translate text between languages
+      parameters:
+      - description: Translation request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            source_lang:
+              type: string
+            target_lang:
+              type: string
+            text:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              source_lang:
+                type: string
+              target_lang:
+                type: string
+              translated_text:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Translate text
+      tags:
+      - processing
+swagger: "2.0"

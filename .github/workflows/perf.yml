@@ -1,0 +1,48 @@
+name: Performance (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "k6 scenario to run"
+        required: true
+        default: baseline
+        type: choice
+        options: [baseline, stress, soak]
+
+jobs:
+  k6-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Start services with Docker Compose
+        run: |
+          docker compose up -d --build
+
+      - name: Wait for API to be healthy
+        run: |
+          for i in {1..30}; do
+            curl -fsS http://localhost:8080/healthz && exit 0
+            sleep 2
+          done
+          echo "API not healthy" && exit 1
+
+      - name: Run selected k6 scenario
+        run: |
+          case "${{ github.event.inputs.scenario }}" in
+            baseline)
+              docker run --rm --network host -e BASE_URL=http://localhost:8080 -e SERVICE_API_KEY=service-secret -v "$PWD/tests/perf":/scripts grafana/k6 run /scripts/k6-baseline.js
+              ;;
+            stress)
+              docker run --rm --network host -e BASE_URL=http://localhost:8080 -e SERVICE_API_KEY=service-secret -v "$PWD/tests/perf":/scripts grafana/k6 run /scripts/k6-stress.js
+              ;;
+            soak)
+              docker run --rm --network host -e BASE_URL=http://localhost:8080 -e SERVICE_API_KEY=service-secret -v "$PWD/tests/perf":/scripts grafana/k6 run /scripts/k6-soak.js
+              ;;
+          esac
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v

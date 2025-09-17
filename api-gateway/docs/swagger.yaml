@@ -1,0 +1,1201 @@
+basePath: /
+info:
+  contact: {}
+  description: API Gateway for QA Showcase with AI completion and user management
+  title: QA Showcase Gateway API
+  version: 0.1.0
+paths:
+  /docs:
+    get:
+      description: Lists all available API documentation
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page
+          schema:
+            type: string
+      summary: API Documentation Index
+      tags:
+      - documentation
+  /docs/unified:
+    get:
+      description: Interactive browser for all APIs with spec switching
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page
+          schema:
+            type: string
+      summary: Unified API Browser
+      tags:
+      - documentation
+  /docs/users/{path}:
+    get:
+      description: Swagger UI for the Users API
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page
+          schema:
+            type: string
+      summary: Users API Swagger UI
+      tags:
+      - documentation
+  /healthz:
+    get:
+      description: Returns the health status of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /v1/admin/system/backup:
+    post:
+      description: Create a system backup
+      parameters:
+      - description: Backup options
+        in: body
+        name: backup
+        schema:
+          properties:
+            compression:
+              type: boolean
+            type:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            properties:
+              backup_id:
+                type: string
+              status:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Create backup
+      tags:
+      - admin
+  /v1/admin/system/backups:
+    get:
+      description: Get list of all system backups
+      parameters:
+      - description: Filter by backup type
+        in: query
+        name: type
+        type: string
+      - description: Filter by backup status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              backups:
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: List backups
+      tags:
+      - admin
+  /v1/admin/system/config:
+    get:
+      description: Get current system configuration settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              config:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get system configuration
+      tags:
+      - admin
+    put:
+      description: Update system configuration settings
+      parameters:
+      - description: Configuration updates
+        in: body
+        name: config
+        required: true
+        schema:
+          properties:
+            section:
+              type: string
+            settings:
+              type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Update system configuration
+      tags:
+      - admin
+  /v1/admin/system/maintenance:
+    post:
+      description: Enable or disable system maintenance mode
+      parameters:
+      - description: Maintenance settings
+        in: body
+        name: maintenance
+        required: true
+        schema:
+          properties:
+            enabled:
+              type: boolean
+            estimated_duration:
+              type: string
+            message:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Set maintenance mode
+      tags:
+      - admin
+  /v1/admin/system/status:
+    get:
+      description: Get overall system health and status information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              status:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get system status
+      tags:
+      - admin
+  /v1/ai/batch:
+    post:
+      description: Submit multiple prompts for batch processing
+      parameters:
+      - description: Batch request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            callback_url:
+              type: string
+            model:
+              type: string
+            requests:
+              type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            properties:
+              job_id:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Batch AI completion
+      tags:
+      - ai
+  /v1/ai/complete:
+    post:
+      consumes:
+      - application/json
+      description: Generate text completion using specified AI model
+      parameters:
+      - description: Completion request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            model:
+              type: string
+            prompt:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              completion:
+                type: string
+              model:
+                type: string
+              traceId:
+                type: string
+              usage:
+                type: object
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: AI text completion
+      tags:
+      - ai
+  /v1/ai/jobs/{jobId}:
+    get:
+      description: Get status and results of a batch processing job
+      parameters:
+      - description: Job ID
+        in: path
+        name: jobId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              job_id:
+                type: string
+              results:
+                type: array
+              status:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get batch job status
+      tags:
+      - ai
+  /v1/ai/metrics:
+    get:
+      description: Get comprehensive metrics for all AI models
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              metrics:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get AI metrics
+      tags:
+      - ai
+  /v1/ai/models:
+    get:
+      description: Get list of all available AI models and their capabilities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              models:
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: List available AI models
+      tags:
+      - ai
+  /v1/ai/models/{model}/configure:
+    post:
+      description: Update configuration settings for a specific model
+      parameters:
+      - description: Model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: Model configuration
+        in: body
+        name: config
+        required: true
+        schema:
+          properties:
+            max_tokens:
+              type: number
+            temperature:
+              type: number
+            top_p:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Configure AI model
+      tags:
+      - ai
+  /v1/ai/models/{model}/status:
+    get:
+      description: Get detailed status and health information for a specific model
+      parameters:
+      - description: Model name
+        in: path
+        name: model
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              health:
+                type: object
+              model:
+                type: string
+              status:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get AI model status
+      tags:
+      - ai
+  /v1/analytics/errors:
+    get:
+      description: Get error analytics and failure patterns
+      parameters:
+      - description: Time frame (1h, 24h, 7d)
+        in: query
+        name: timeframe
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              errors:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get error analytics
+      tags:
+      - analytics
+  /v1/analytics/events:
+    post:
+      description: Track custom analytics event
+      parameters:
+      - description: Event data
+        in: body
+        name: event
+        required: true
+        schema:
+          properties:
+            event_name:
+              type: string
+            properties:
+              type: object
+            user_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Track event
+      tags:
+      - analytics
+  /v1/analytics/performance:
+    get:
+      description: Get system performance metrics and health data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              performance:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get performance metrics
+      tags:
+      - analytics
+  /v1/analytics/usage:
+    get:
+      description: Get detailed usage analytics and statistics
+      parameters:
+      - description: Time period (day, week, month)
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              analytics:
+                type: object
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get usage analytics
+      tags:
+      - analytics
+  /v1/audit/logs:
+    get:
+      description: Get list of audit logs with filtering options
+      parameters:
+      - description: Filter by action type
+        in: query
+        name: action
+        type: string
+      - description: Filter by user ID
+        in: query
+        name: user_id
+        type: string
+      - description: Start date (RFC3339)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (RFC3339)
+        in: query
+        name: end_date
+        type: string
+      - description: Number of records to return
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              logs:
+                type: array
+              total:
+                type: number
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get audit logs
+      tags:
+      - audit
+    post:
+      description: Create a new audit log entry
+      parameters:
+      - description: Audit log data
+        in: body
+        name: log
+        required: true
+        schema:
+          properties:
+            action:
+              type: string
+            details:
+              type: object
+            user_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              log_id:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Create audit log
+      tags:
+      - audit
+  /v1/audit/logs/{logId}:
+    get:
+      description: Get detailed information about a specific audit log entry
+      parameters:
+      - description: Audit log ID
+        in: path
+        name: logId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              log:
+                type: object
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get audit log
+      tags:
+      - audit
+  /v1/notifications:
+    get:
+      description: Get list of notifications for the current user
+      parameters:
+      - description: Filter by read status
+        in: query
+        name: read
+        type: boolean
+      - description: Filter by notification type
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              notifications:
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: List notifications
+      tags:
+      - notifications
+    post:
+      description: Create a new notification
+      parameters:
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+            recipients:
+              type: array
+            title:
+              type: string
+            type:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              notification_id:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Create notification
+      tags:
+      - notifications
+  /v1/notifications/{notificationId}:
+    delete:
+      description: Delete a specific notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notificationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Delete notification
+      tags:
+      - notifications
+  /v1/notifications/{notificationId}/read:
+    put:
+      description: Mark a specific notification as read
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notificationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Mark notification as read
+      tags:
+      - notifications
+  /v1/notifications/broadcast:
+    post:
+      description: Send notification to all users or specific groups
+      parameters:
+      - description: Broadcast data
+        in: body
+        name: broadcast
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+            target:
+              type: string
+            title:
+              type: string
+            type:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              broadcast_id:
+                type: string
+              recipients:
+                type: number
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Broadcast notification
+      tags:
+      - notifications
+  /v1/workflows:
+    get:
+      description: Get list of all workflows
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by user ID
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              workflows:
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: List workflows
+      tags:
+      - workflows
+    post:
+      description: Create a new workflow
+      parameters:
+      - description: Workflow definition
+        in: body
+        name: workflow
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            steps:
+              type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              status:
+                type: string
+              workflow_id:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Create workflow
+      tags:
+      - workflows
+  /v1/workflows/{workflowId}:
+    get:
+      description: Get detailed workflow information
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              workflow:
+                type: object
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get workflow
+      tags:
+      - workflows
+    put:
+      description: Update an existing workflow
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      - description: Updated workflow
+        in: body
+        name: workflow
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            steps:
+              type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Update workflow
+      tags:
+      - workflows
+  /v1/workflows/{workflowId}/approve:
+    post:
+      description: Approve a pending workflow step
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      - description: Approval details
+        in: body
+        name: approval
+        required: true
+        schema:
+          properties:
+            comment:
+              type: string
+            step_id:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Approve workflow
+      tags:
+      - workflows
+  /v1/workflows/{workflowId}/execute:
+    post:
+      description: Start execution of a workflow
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      - description: Execution parameters
+        in: body
+        name: params
+        schema:
+          properties:
+            parameters:
+              type: object
+            priority:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              execution_id:
+                type: string
+              status:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Execute workflow
+      tags:
+      - workflows
+  /v1/workflows/{workflowId}/reject:
+    post:
+      description: Reject a pending workflow step
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      - description: Rejection details
+        in: body
+        name: rejection
+        required: true
+        schema:
+          properties:
+            reason:
+              type: string
+            step_id:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Reject workflow
+      tags:
+      - workflows
+  /v1/workflows/{workflowId}/status:
+    get:
+      description: Get current status of a workflow execution
+      parameters:
+      - description: Workflow ID
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              execution:
+                type: object
+              status:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get workflow status
+      tags:
+      - workflows
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: x-api-key
+    type: apiKey
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

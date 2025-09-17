@@ -1,0 +1,549 @@
+basePath: /
+definitions:
+  main.HealthStatus:
+    properties:
+      avg_latency:
+        example: 150ms
+        type: string
+      cpu_usage:
+        example: 25%
+        type: string
+      details:
+        additionalProperties: true
+        type: object
+      error_count:
+        example: 3
+        type: integer
+      last_error:
+        type: string
+      memory_usage:
+        example: 512MB
+        type: string
+      request_count:
+        example: 1250
+        type: integer
+      status:
+        example: healthy
+        type: string
+      uptime:
+        example: 2h 15m 30s
+        type: string
+    type: object
+  main.ModelInfo:
+    properties:
+      capabilities:
+        items:
+          type: string
+        type: array
+      config:
+        additionalProperties: true
+        type: object
+      max_tokens:
+        example: 4096
+        type: integer
+      name:
+        example: adapter-a
+        type: string
+      status:
+        example: active
+        type: string
+      type:
+        example: text-completion
+        type: string
+      version:
+        example: 1.2.0
+        type: string
+    type: object
+  main.UsageInfo:
+    properties:
+      completion_tokens:
+        example: 25
+        type: integer
+      prompt_tokens:
+        example: 10
+        type: integer
+      total_tokens:
+        example: 35
+        type: integer
+    type: object
+  main.completeRequest:
+    properties:
+      max_tokens:
+        example: 100
+        type: integer
+      model:
+        example: adapter-a
+        type: string
+      prompt:
+        example: Hello world
+        type: string
+      temperature:
+        example: 0.7
+        type: number
+      top_p:
+        example: 0.9
+        type: number
+    type: object
+  main.completeResponse:
+    properties:
+      completion:
+        example: 'A: Hello world response'
+        type: string
+      created_at:
+        example: "2025-09-16T10:30:00Z"
+        type: string
+      model:
+        example: adapter-a
+        type: string
+      request_id:
+        example: req-123
+        type: string
+      usage:
+        $ref: '#/definitions/main.UsageInfo'
+    type: object
+info:
+  contact: {}
+  description: AI completion service adapter A with model management and monitoring
+  title: AI Adapter A API
+  version: 1.2.0
+paths:
+  /batch:
+    post:
+      consumes:
+      - application/json
+      description: Submit multiple prompts for batch processing
+      parameters:
+      - description: Batch request
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            model:
+              type: string
+            options:
+              type: object
+            prompts:
+              type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            properties:
+              batch_id:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Batch completion
+      tags:
+      - batch
+  /batch/{batchId}:
+    delete:
+      description: Cancel a running batch processing job
+      parameters:
+      - description: Batch ID
+        in: path
+        name: batchId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cancel batch
+      tags:
+      - batch
+    get:
+      description: Get status and results of a batch processing job
+      parameters:
+      - description: Batch ID
+        in: path
+        name: batchId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              batch_id:
+                type: string
+              results:
+                type: array
+              status:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get batch status
+      tags:
+      - batch
+  /benchmark:
+    post:
+      consumes:
+      - application/json
+      description: Start a performance benchmark test
+      parameters:
+      - description: Benchmark configuration
+        in: body
+        name: benchmark
+        required: true
+        schema:
+          properties:
+            concurrent_requests:
+              type: number
+            duration:
+              type: number
+            test_type:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            properties:
+              benchmark_id:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Run benchmark
+      tags:
+      - performance
+  /benchmark/{benchmarkId}:
+    get:
+      description: Get results of a performance benchmark test
+      parameters:
+      - description: Benchmark ID
+        in: path
+        name: benchmarkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              benchmark_id:
+                type: string
+              results:
+                type: object
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get benchmark results
+      tags:
+      - performance
+  /complete:
+    post:
+      consumes:
+      - application/json
+      description: Generate AI text completion using adapter A
+      parameters:
+      - description: Completion request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.completeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.completeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate text completion
+      tags:
+      - completion
+  /config:
+    get:
+      description: Get current service configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              config:
+                type: object
+            type: object
+      summary: Get configuration
+      tags:
+      - configuration
+    put:
+      consumes:
+      - application/json
+      description: Update service configuration settings
+      parameters:
+      - description: Configuration updates
+        in: body
+        name: config
+        required: true
+        schema:
+          properties:
+            section:
+              type: string
+            settings:
+              type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update configuration
+      tags:
+      - configuration
+  /config/reset:
+    post:
+      description: Reset configuration to default values
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reset configuration
+      tags:
+      - configuration
+  /health:
+    get:
+      description: Get basic health status of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - monitoring
+  /metrics:
+    get:
+      description: Get comprehensive performance metrics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              metrics:
+                type: object
+            type: object
+      summary: Get metrics
+      tags:
+      - monitoring
+  /model:
+    get:
+      description: Get detailed information about the AI model
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ModelInfo'
+      summary: Get model information
+      tags:
+      - model
+  /model/capabilities:
+    get:
+      description: Get detailed capabilities and features of the model
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              capabilities:
+                type: object
+            type: object
+      summary: Get model capabilities
+      tags:
+      - model
+  /model/config:
+    put:
+      consumes:
+      - application/json
+      description: Update model configuration parameters
+      parameters:
+      - description: Configuration updates
+        in: body
+        name: config
+        required: true
+        schema:
+          properties:
+            max_tokens:
+              type: number
+            temperature:
+              type: number
+            top_p:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update model configuration
+      tags:
+      - model
+  /model/reload:
+    post:
+      description: Reload the AI model with current configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reload model
+      tags:
+      - model
+  /queue:
+    get:
+      description: Get current processing queue status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              queue:
+                type: object
+            type: object
+      summary: Get queue status
+      tags:
+      - queue
+  /queue/clear:
+    post:
+      description: Clear all pending jobs from the processing queue
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Clear queue
+      tags:
+      - queue
+  /queue/stats:
+    get:
+      description: Get detailed queue processing statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              stats:
+                type: object
+            type: object
+      summary: Get queue statistics
+      tags:
+      - queue
+  /status:
+    get:
+      description: Get comprehensive status information including health details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.HealthStatus'
+      summary: Get detailed status
+      tags:
+      - monitoring
+swagger: "2.0"

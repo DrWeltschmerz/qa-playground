@@ -1,0 +1,36 @@
+{
+  "name": "qa-showcase",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "serve:demo": "node scripts/serve-demo.js",
+    "test:api": "playwright test --project=api-tests",
+    "test": "playwright test",
+    "test:all": "playwright test --project=api-tests",
+    "test:exercises": "playwright test --project=exercises",
+    "test:ui": "playwright test --project=ui-demo",
+    "test:smoke": "playwright test --project=smoke",
+    "test:contract": "playwright test --project=contract",
+    "ci": "playwright test --reporter=list,html,json && node scripts/collect-metrics.js",
+    "k6:smoke": "echo 'Run k6 via Docker or CI action'",
+    "k6:baseline": "echo 'Use Docker: docker run -i grafana/k6 run -e BASE_URL=$BASE_URL - < tests/perf/k6-baseline.js'",
+    "k6:stress": "echo 'Use Docker: docker run -i grafana/k6 run -e BASE_URL=$BASE_URL - < tests/perf/k6-stress.js'",
+    "k6:soak": "echo 'Use Docker: docker run -i grafana/k6 run -e BASE_URL=$BASE_URL - < tests/perf/k6-soak.js'"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.5.0",
+    "ajv": "^8.17.1",
+    "typescript": "^5.5.4"
+  },
+  "description": "A compact, production-like demo that highlights API QA, web QA foundations, CI/CD, and observability.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

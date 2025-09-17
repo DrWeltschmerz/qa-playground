@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Playground Demo App</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>QA Playground Demo</h1>
+      <nav>
+        <a href="/ui" target="_self">Back to Tools</a>
+        <a href="/docs" target="_blank">Docs</a>
+      </nav>
+    </header>
+    <main>
+      <section class="login card" data-testid="login-section">
+        <h2>Login / Sign up</h2>
+        <div class="row">
+          <input id="email" placeholder="email" data-testid="email" />
+          <input id="password" type="password" placeholder="password" data-testid="password" />
+          <button id="signup" data-testid="signup">Sign up</button>
+          <button id="signin" data-testid="signin">Sign in</button>
+        </div>
+        <p class="small">Tip: leave empty to auto-generate a user.</p>
+      </section>
+
+      <section class="compose card" data-testid="compose-section">
+        <h2>AI Compose</h2>
+        <div class="row">
+          <textarea id="prompt" placeholder="Write a short announcement about our new feature" data-testid="prompt"></textarea>
+        </div>
+        <div class="row">
+          <button id="compose" data-testid="compose">Compose</button>
+          <button id="publish" disabled data-testid="publish">Publish Notification</button>
+          <button id="copy-content" data-testid="copy-content">Copy to Clipboard</button>
+        </div>
+        <pre id="compose-out" class="out" data-testid="compose-out"></pre>
+      </section>
+
+      <section class="workflow card" data-testid="workflow-section">
+        <h2>Approval Workflow</h2>
+        <div class="row">
+          <button id="create-wf" data-testid="create-wf">Create Workflow</button>
+          <button id="approve-wf" disabled data-testid="approve-wf">Approve</button>
+          <button id="open-preview" disabled data-testid="open-preview">Open Preview (new tab)</button>
+        </div>
+        <pre id="wf-out" class="out" data-testid="wf-out"></pre>
+      </section>
+
+      <section class="activity card" data-testid="activity-section">
+        <h2>Recent Activity</h2>
+        <div class="row">
+          <button id="refresh-activity" data-testid="refresh-activity">Refresh</button>
+          <button id="download-csv" data-testid="download-csv">Download CSV</button>
+        </div>
+        <pre id="activity-out" class="out" data-testid="activity-out"></pre>
+      </section>
+
+      <section class="extras card" data-testid="extras-section">
+        <h2>Extras (Tricky UI)</h2>
+        <div class="row">
+          <input id="file-input" type="file" data-testid="file-input" />
+          <div id="drop-zone" class="drop-zone" data-testid="drop-zone">Drop file here</div>
+        </div>
+        <div class="row">
+          <iframe id="widget-frame" srcdoc="<!doctype html><html><body style='font-family:sans-serif'><h4>Embedded Widget</h4><button id='ping'>Ping Parent</button><script>document.getElementById('ping').onclick = () => parent.postMessage({type:'widget-ping', ts: Date.now()}, '*');</script></body></html>" title="widget" data-testid="widget-frame"></iframe>
+          <div id="widget-out" class="out" data-testid="widget-out"></div>
+        </div>
+        <div class="row">
+          <button id="open-modal" data-testid="open-modal">Open Confirm Modal</button>
+        </div>
+      </section>
+
+      <dialog id="confirm-modal" data-testid="confirm-modal">
+        <p>Are you sure you want to approve?</p>
+        <div class="row">
+          <button id="modal-cancel" data-testid="modal-cancel">Cancel</button>
+          <button id="modal-ok" data-testid="modal-ok">OK</button>
+        </div>
+      </dialog>
+    </main>
+    <footer>
+      <span>API: <code id="base-url"></code></span>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

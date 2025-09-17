@@ -1,0 +1,24 @@
+services:
+  api:
+    build: ./api-gateway
+    environment:
+      PORT: "8080"
+      DB_DSN: "file::memory:?cache=shared"
+      JWT_SECRET: "dev-secret"
+      SERVICE_API_KEY: "service-secret"
+      ADAPTER_A_URL: "http://adapter-a:8081"
+      ADAPTER_B_URL: "http://adapter-b:8082"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - adapter-a
+      - adapter-b
+  adapter-a:
+    build: ./services/adapter-a
+    ports:
+      - "8081:8081"
+  adapter-b:
+    build: ./services/adapter-b
+    ports:
+      - "8082:8082"
+ 

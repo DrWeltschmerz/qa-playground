@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Playground UI</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>QA Playground</h1>
+      <nav>
+        <a href="#settings">Settings</a>
+        <a href="#users">Users</a>
+        <a href="#admin">Admin</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#notifications">Notifications</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#ai">AI</a>
+        <a href="#audit">Audit</a>
+        <a href="#adapters">Adapters</a>
+        <a class="right" href="/docs" target="_blank">Docs</a>
+        <a class="right" href="/specs/gateway.json" target="_blank">OpenAPI</a>
+      </nav>
+    </header>
+
+    <main id="app">
+      <section id="settings" class="card">
+        <h2>Settings</h2>
+        <div class="row">
+          <input id="cfg-base" placeholder="Base URL" />
+          <input id="cfg-key" placeholder="Service API Key" />
+          <button id="cfg-save">Save</button>
+          <button id="cfg-reset">Reset</button>
+        </div>
+        <div class="row small">
+          <span>JWT: <code id="cfg-jwt"></code></span>
+          <button id="cfg-clear-jwt">Clear JWT</button>
+        </div>
+      </section>
+      <section id="users" class="card">
+        <h2>Users</h2>
+        <div class="row">
+          <input id="reg-email" placeholder="email" />
+          <input id="reg-username" placeholder="username" />
+          <input id="reg-password" placeholder="password" type="password" />
+          <button id="register">Register</button>
+        </div>
+        <div class="row">
+          <input id="login-username" placeholder="username or email" />
+          <input id="login-password" placeholder="password" type="password" />
+          <button id="login">Login</button>
+          <button id="me">Me</button>
+          <button id="run-flow" title="Register → Login → AI batch → Analytics usage">Run Flow</button>
+        </div>
+        <pre id="users-out" class="out"></pre>
+      </section>
+
+      <section id="admin" class="card">
+        <h2>Admin</h2>
+        <div class="row">
+          <label><input type="checkbox" id="maintenance-toggle" /> Maintenance</label>
+          <button id="status">Status</button>
+          <button id="config">Config</button>
+        </div>
+        <div class="row">
+          <button id="backup-create">Create Backup</button>
+          <button id="backup-list">List Backups</button>
+        </div>
+        <pre id="admin-out" class="out"></pre>
+      </section>
+
+      <section id="analytics" class="card">
+        <h2>Analytics</h2>
+        <div class="row">
+          <input id="analytics-from" placeholder="from ISO" />
+          <input id="analytics-to" placeholder="to ISO" />
+          <button id="analytics-usage">Usage</button>
+          <select id="analytics-window">
+            <option value="15m">15m</option>
+            <option value="1h">1h</option>
+            <option value="24h">24h</option>
+          </select>
+          <button id="analytics-perf">Performance</button>
+          <input id="analytics-service" placeholder="service" value="api" />
+          <button id="analytics-errors">Errors</button>
+        </div>
+        <pre id="analytics-out" class="out"></pre>
+      </section>
+
+      <section id="notifications" class="card">
+        <h2>Notifications</h2>
+        <div class="row">
+          <input id="notif-subject" placeholder="subject" />
+          <input id="notif-body" placeholder="body" />
+          <button id="notif-create">Create</button>
+        </div>
+        <div class="row">
+          <input id="notif-id" placeholder="notification id" />
+          <button id="notif-get">Get</button>
+          <button id="notif-status">Status</button>
+        </div>
+        <pre id="notifications-out" class="out"></pre>
+      </section>
+
+      <section id="workflows" class="card">
+        <h2>Workflows</h2>
+        <div class="row">
+          <input id="wf-name" placeholder="workflow name" />
+          <button id="wf-create">Create</button>
+        </div>
+        <div class="row">
+          <input id="wf-id" placeholder="workflow id" />
+          <button id="wf-get">Get</button>
+          <button id="wf-approve">Approve</button>
+          <button id="wf-reject">Reject</button>
+        </div>
+        <pre id="workflows-out" class="out"></pre>
+      </section>
+
+      <section id="ai" class="card">
+        <h2>AI</h2>
+        <div class="row">
+          <button id="ai-models">List Models</button>
+          <button id="ai-metrics">Metrics</button>
+        </div>
+        <div class="row">
+          <input id="ai-batch-inputs" placeholder='["hello","world"]' />
+          <button id="ai-batch">Submit Batch</button>
+          <input id="ai-job-id" placeholder="job id" />
+          <button id="ai-job">Job Status</button>
+        </div>
+        <pre id="ai-out" class="out"></pre>
+      </section>
+
+      <section id="audit" class="card">
+        <h2>Audit Logs</h2>
+        <div class="row">
+          <input id="audit-actor" placeholder="actor (e.g., admin)" />
+          <input id="audit-action" placeholder="action (e.g., backup.create)" />
+          <input id="audit-page" type="number" placeholder="page" value="1" min="1" style="width:90px" />
+          <input id="audit-limit" type="number" placeholder="limit" value="10" min="1" style="width:90px" />
+          <select id="audit-order"><option value="desc">desc</option><option value="asc">asc</option></select>
+          <button id="audit-search">Search</button>
+          <button id="audit-prev">Prev</button>
+          <button id="audit-next">Next</button>
+        </div>
+        <pre id="audit-out" class="out"></pre>
+      </section>
+
+      <section id="adapters" class="card">
+        <h2>Adapters</h2>
+        <div class="row">
+          <button id="adp-a-health">Adapter A Health</button>
+          <button id="adp-b-health">Adapter B Health</button>
+          <button id="adp-a-model">A: Model Info</button>
+          <button id="adp-b-models">B: Models Available</button>
+          <button id="adp-b-sentiment">B: Analyze Sentiment</button>
+        </div>
+        <pre id="adapters-out" class="out"></pre>
+      </section>
+
+      <section id="exercises" class="card">
+        <h2>Exercises</h2>
+        <div class="row">
+          <button id="ex-admin">Show Admin Maintenance examples</button>
+          <button id="ex-ai">Show AI Batch examples</button>
+          <button id="ex-users">Show Users Login examples</button>
+          <button id="ex-notifs">Show Notifications examples</button>
+          <button id="ex-wf">Show Workflows examples</button>
+          <button id="ex-copy-curl">Copy curl</button>
+          <button id="ex-copy-pw">Copy Playwright</button>
+          <button id="ex-copy-both">Copy both</button>
+        </div>
+        <div class="row">
+          <div style="flex:1; min-width:260px">
+            <h3 style="margin:4px 0 6px 0">curl</h3>
+            <pre id="ex-out-curl" class="out code code-sh"></pre>
+          </div>
+          <div style="flex:1; min-width:260px">
+            <h3 style="margin:4px 0 6px 0">Playwright</h3>
+            <pre id="ex-out-pw" class="out code code-ts"></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>API: <code id="base-url"></code></span>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

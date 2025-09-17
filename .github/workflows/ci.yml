@@ -1,0 +1,174 @@
+name: CI
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Playwright browsers
+        run: npx -y playwright@1.55.0 install --with-deps
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build images (Docker Compose)
+        run: docker compose build --pull
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy backend (API + adapters)
+        run: docker compose up -d adapter-a adapter-b api
+
+      - name: Wait for API to be healthy
+        run: |
+          for i in {1..40}; do
+            curl -fsS http://localhost:8080/healthz && exit 0
+            sleep 2
+          done
+          echo "API not healthy" && docker compose logs api && exit 1
+
+      - name: Smoke test (k6)
+        run: |
+          docker run --rm --network host \
+            -e BASE_URL=http://localhost:8080 \
+            -e SERVICE_API_KEY=service-secret \
+            -v "$PWD/tests/perf":/scripts \
+            grafana/k6 run /scripts/k6-smoke.js
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v
+
+  ui-tests:
+    runs-on: ubuntu-latest
+    needs: [smoke]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Playwright browsers
+        run: npx -y playwright@1.55.0 install --with-deps
+
+      - name: Deploy backend (API + adapters)
+        run: docker compose up -d adapter-a adapter-b api
+
+      - name: Wait for API to be healthy
+        run: |
+          for i in {1..40}; do
+            curl -fsS http://localhost:8080/healthz && exit 0
+            sleep 2
+          done
+          echo "API not healthy" && docker compose logs api && exit 1
+
+      - name: Deploy frontend (static UIs)
+        run: |
+          docker compose restart api
+          curl -fsS http://localhost:8080/ui/ | head -n 1
+          curl -fsS http://localhost:8080/demo/ | head -n 1
+
+      - name: Run UI tests (Makefile)
+        env:
+          BASE_URL: http://localhost:8080
+        run: make test-ui WORKERS=4
+
+      - name: Upload Playwright report (UI)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-ui
+          path: playwright-report
+
+      - name: Upload raw test results (UI)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-ui
+          path: test-results
+
+      - name: Docker logs (on failure)
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v
+
+  api-tests:
+    runs-on: ubuntu-latest
+    needs: [smoke]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Playwright browsers
+        run: npx -y playwright@1.55.0 install --with-deps
+
+      - name: Deploy backend (API + adapters)
+        run: docker compose up -d adapter-a adapter-b api
+
+      - name: Wait for API to be healthy
+        run: |
+          for i in {1..40}; do
+            curl -fsS http://localhost:8080/healthz && exit 0
+            sleep 2
+          done
+          echo "API not healthy" && docker compose logs api && exit 1
+
+      - name: Run API tests (Makefile)
+        env:
+          BASE_URL: http://localhost:8080
+        run: make test-api-only WORKERS=4
+
+      - name: Upload Playwright report (API)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-api
+          path: playwright-report
+
+      - name: Upload raw test results (API)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-api
+          path: test-results
+
+      - name: Docker logs (on failure)
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v

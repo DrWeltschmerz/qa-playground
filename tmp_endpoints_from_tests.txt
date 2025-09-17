@@ -1,0 +1,7 @@
+/v1/adapter-a/complete
+/v1/adapter-a/health
+/v1/adapter-a/model
+/v1/adapter-b/health
+/v1/adapter-b/models/available
+/v1/ai/complete
+/v1/workflows
