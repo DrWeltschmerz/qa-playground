@@ -94,8 +94,8 @@ docs-users:
 	cp -v tmp-users-adapter-gin/docs/swagger.json api-gateway/static/specs/users.json
 	@echo "users.json generated at api-gateway/static/specs/users.json"
 	@echo "Endpoints: $$(cat api-gateway/static/specs/users.json | jq '.paths | length' 2>/dev/null || echo 'unknown')"
- 	@echo "Cleaning up tmp-users-adapter-gin..."
- 	rm -rf tmp-users-adapter-gin || true
+	@echo "Cleaning up tmp-users-adapter-gin..."
+	rm -rf tmp-users-adapter-gin || true
 
 # k6
 k6-smoke:

@@ -1,5 +1,8 @@
 # QA Playground — API-first tests (Go + TS)
 
+[![CI](https://github.com/DrWeltschmerz/qa-playground/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DrWeltschmerz/qa-playground/actions/workflows/ci.yml)
+[![Playwright](https://img.shields.io/badge/Playwright-1.55.0-45ba4b?logo=playwright)](https://playwright.dev)
+
 Heads up: this repo is about the tests. The API and services are just a sandbox to practice automation.
 
 Docs Portal: see [docs/INDEX.md](docs/INDEX.md) for quick links (UI guides, selector best practices, test plan, matrices). For a guided onboarding, use [learn/LEARNING-PATH.md](learn/LEARNING-PATH.md).
