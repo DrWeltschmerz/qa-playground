@@ -13,6 +13,10 @@ button:hover { background: #1d4ed8; }
 label { display: inline-flex; align-items: center; gap: 6px; }
 .out { background: #0b1220; border: 1px dashed #374151; padding: 8px; border-radius: 6px; height: 160px; overflow: auto; }
 .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; line-height: 1.4; }
+.code-sh, .code-ts { white-space: pre; }
+.tok-kw { color: #93c5fd; font-weight: 600; }
+.tok-flag { color: #fbbf24; }
+.tok-str { color: #34d399; }
 h3 { font-size: 13px; color: #9ca3af; font-weight: 600; }
 footer { padding: 10px 16px; color: #9ca3af; border-top: 1px solid #1f2937; }
 .invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.3); }

@@ -22,7 +22,8 @@ if (pw && Array.isArray(pw.suites)) {
   pw.suites.forEach(walk);
 }
 
-const summary = { total, passed, failed, timestamp: new Date().toISOString() };
+const pct = total ? +(passed / total * 100).toFixed(1) : 0;
+const summary = { total, passed, failed, pct, timestamp: new Date().toISOString() };
 fs.mkdirSync('test-results', { recursive: true });
 fs.writeFileSync('test-results/summary.json', JSON.stringify(summary, null, 2));
 console.log('Test summary:', summary);

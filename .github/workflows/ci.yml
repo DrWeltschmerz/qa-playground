@@ -86,6 +86,14 @@ jobs:
           BASE_URL: http://localhost:8080
         run: make test-api-only WORKERS=4
 
+      - name: Summarize test results (percentage)
+        if: always()
+        run: |
+          node scripts/collect-metrics.js || true
+          if [ -f test-results/summary.json ]; then
+            node -e "const fs=require('fs');const p=process.env;const s=JSON.parse(fs.readFileSync('test-results/summary.json','utf8'));const pct=s.total?((s.passed/s.total)*100).toFixed(1):'0.0';const lines=[`### Test Summary`,``,`- Passed: ${s.passed}/${s.total} (${pct}%)`,`- Failed: ${s.failed}`].join('\n');fs.appendFileSync(p.GITHUB_STEP_SUMMARY,lines+'\n');console.log(lines);"
+          fi
+
       - name: Upload Playwright report (API)
         if: always()
         uses: actions/upload-artifact@v4

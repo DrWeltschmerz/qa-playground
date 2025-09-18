@@ -189,9 +189,29 @@
   };
 
   // WORKFLOWS
+  const stepsField = document.getElementById('wf-steps');
+  const getStepsFromUI = () => {
+    try {
+      const raw = (stepsField?.value || '').trim();
+      if (!raw) return [ { id: 'start', name: 'Start', type: 'task' } ];
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr) || arr.length === 0) return [ { id: 'start', name: 'Start', type: 'task' } ];
+      return arr;
+    } catch { return [ { id: 'start', name: 'Start', type: 'task' } ]; }
+  };
+  const setStepsUI = (arr) => { if (stepsField) stepsField.value = JSON.stringify(arr, null, 2); };
+  document.getElementById('wf-add-start')?.addEventListener('click', () => {
+    const arr = getStepsFromUI(); arr.push({ id: `start-${Date.now().toString(36)}`, name: 'Start', type: 'task' }); setStepsUI(arr);
+  });
+  document.getElementById('wf-add-approval')?.addEventListener('click', () => {
+    const arr = getStepsFromUI(); arr.push({ id: `approve-${Date.now().toString(36)}`, name: 'Approval', type: 'manual' }); setStepsUI(arr);
+  });
+  document.getElementById('wf-clear-steps')?.addEventListener('click', () => setStepsUI([]));
+
   document.getElementById('wf-create').onclick = async () => {
     const name = document.getElementById('wf-name').value || `wf-${Date.now()}`;
-    const { data } = await fetchJSON(`${state.base}/v1/workflows/`, { method: 'POST', headers: headers(), body: JSON.stringify({ name, steps: [ { name: 'start' } ] }) });
+    const steps = getStepsFromUI();
+    const { data } = await fetchJSON(`${state.base}/v1/workflows/`, { method: 'POST', headers: headers(), body: JSON.stringify({ name, steps, description: 'Created via UI' }) });
     out('workflows-out', data);
     if (data?.id) { localStorage.setItem('qa.wfId', data.id); if ($('wf-id')) $('wf-id').value = data.id; }
   };
@@ -201,16 +221,25 @@
     const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(need)}`, { headers: headers() });
     out('workflows-out', data);
   };
+  // Execute a workflow to create an execution context
+  const wfExecBtn = document.getElementById('wf-execute');
+  if (wfExecBtn) wfExecBtn.onclick = async () => {
+    const id = requireVal('wf-id'); if (!id) return;
+    const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(id)}/execute`, { method: 'POST', headers: headers(), body: JSON.stringify({ triggered_by: 'ui-demo' }) });
+    out('workflows-out', data);
+  };
   document.getElementById('wf-approve').onclick = async () => {
-    const id = document.getElementById('wf-id').value;
-    const need = requireVal('wf-id'); if (!need) return;
-    const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(need)}/approve`, { method: 'POST', headers: headers(), body: JSON.stringify({ reason: 'ok' }) });
+    const id = requireVal('wf-id'); if (!id) return;
+    // Backend expects approver and decision === "approved"
+    const payload = { approver: 'ui-demo', decision: 'approved', comments: 'Approved via UI', timestamp: new Date().toISOString() };
+    const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(id)}/approve`, { method: 'POST', headers: headers(), body: JSON.stringify(payload) });
     out('workflows-out', data);
   };
   document.getElementById('wf-reject').onclick = async () => {
-    const id = document.getElementById('wf-id').value;
-    const need = requireVal('wf-id'); if (!need) return;
-    const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(need)}/reject`, { method: 'POST', headers: headers(), body: JSON.stringify({ reason: 'no' }) });
+    const id = requireVal('wf-id'); if (!id) return;
+    // Backend expects decision === "rejected"
+    const payload = { approver: 'ui-demo', decision: 'rejected', comments: 'Rejected via UI', reason: 'no', timestamp: new Date().toISOString() };
+    const { data } = await fetchJSON(`${state.base}/v1/workflows/${encodeURIComponent(id)}/reject`, { method: 'POST', headers: headers(), body: JSON.stringify(payload) });
     out('workflows-out', data);
   };
 
@@ -399,20 +428,25 @@
     const name = `wf-${Date.now()}`;
     const curl = code(`
       curl -s -X POST -H 'x-api-key: ${state.key}' -H 'content-type: application/json' \
-        -d '{"name":"${name}","steps":[{"name":"start"}]}' ${state.base}/v1/workflows/ | jq .
+        -d '{"name":"${name}","steps":[{"id":"start","name":"Start","type":"task"}]}' ${state.base}/v1/workflows/ | jq .
       # replace <id>
       curl -s -H 'x-api-key: ${state.key}' ${state.base}/v1/workflows/<id> | jq .
-      curl -s -X POST -H 'x-api-key: ${state.key}' -H 'content-type: application/json' ${state.base}/v1/workflows/<id>/approve | jq .
+      # start execution before any approvals
+      curl -s -X POST -H 'x-api-key: ${state.key}' -H 'content-type: application/json' \
+        -d '{"triggered_by":"ui-demo"}' ${state.base}/v1/workflows/<id>/execute | jq .
+      curl -s -X POST -H 'x-api-key: ${state.key}' -H 'content-type: application/json' \
+        -d '{"approver":"ui-demo","decision":"approved","comments":"Approved via example"}' ${state.base}/v1/workflows/<id>/approve | jq .
     `);
     const pw = code(`
       import { test, expect } from '@playwright/test';
       test('workflow approval', async ({ request }) => {
         const headers = { 'x-api-key': '${state.key}', 'content-type': 'application/json' };
-        const created = await (await request.post('/v1/workflows/', { headers, data: { name: '${name}', steps: [ { name: 'start' } ] } })).json();
+        const created = await (await request.post('/v1/workflows/', { headers, data: { name: '${name}', steps: [ { id: 'start', name: 'Start', type: 'task' } ] } })).json();
         const id = created.id; expect(id).toBeTruthy();
-        await request.post('/v1/workflows/' + id + '/approve', { headers, data: { reason: 'ok' } });
+        await request.post('/v1/workflows/' + id + '/execute', { headers, data: { triggered_by: 'ui-demo' } });
+        await request.post('/v1/workflows/' + id + '/approve', { headers, data: { approver: 'ui-demo', decision: 'approved', comments: 'ok' } });
         const got = await (await request.get('/v1/workflows/' + id, { headers })).json();
-        expect(['approved','rejected','completed']).toContain(got.status || got.state);
+        expect(got.id).toBe(id);
       });
     `);
     setExamples(curl, pw);

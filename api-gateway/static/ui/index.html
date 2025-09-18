@@ -19,6 +19,7 @@
         <a href="#ai">AI</a>
         <a href="#audit">Audit</a>
         <a href="#adapters">Adapters</a>
+        <a class="right" href="/demo" target="_blank">Demo</a>
         <a class="right" href="/docs" target="_blank">Docs</a>
         <a class="right" href="/specs/gateway.json" target="_blank">OpenAPI</a>
       </nav>
@@ -110,8 +111,17 @@
           <button id="wf-create">Create</button>
         </div>
         <div class="row">
+          <textarea id="wf-steps" placeholder='[{"id":"start","name":"Start","type":"task"}]' rows="4" style="width:100%"></textarea>
+        </div>
+        <div class="row small">
+          <button id="wf-add-start" title="Add a Start task step">+ Start</button>
+          <button id="wf-add-approval" title="Add a Manual approval step">+ Approval</button>
+          <button id="wf-clear-steps" title="Clear steps">Clear</button>
+        </div>
+        <div class="row">
           <input id="wf-id" placeholder="workflow id" />
           <button id="wf-get">Get</button>
+          <button id="wf-execute" title="Start execution">Execute</button>
           <button id="wf-approve">Approve</button>
           <button id="wf-reject">Reject</button>
         </div>
@@ -189,6 +199,6 @@
       <span>API: <code id="base-url"></code></span>
     </footer>
 
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20250918"></script>
   </body>
 </html>
