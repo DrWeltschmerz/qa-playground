@@ -78,13 +78,7 @@ Quick runs (Playwright projects are defined in `playwright.config.ts`):
 - Notifications (serial): `npx playwright test --project=notifications-single`
 - UI Demo: `npx playwright test --project=ui-demo`
 - Exercises: `npx playwright test --project=exercises`
-
-Parallelism & projects:
-- Default is fully-parallel runs. Notifications spec is isolated under a dedicated project for predictable ordering.
-- Example fast runs:
-  - All api-tests (parallel): `npx playwright test --project=api-tests`
-  - Notifications (serial): `npx playwright test --project=notifications-single`
-  - Crank up workers locally: `npx playwright test --workers=10`
+- Crank up workers locally: `npx playwright test --workers=10`
 
 ## Config
 - In-memory SQLite by default: `DB_DSN=:memory:`
@@ -119,25 +113,14 @@ Learn path for QAs:
 - Strategy in [docs/LOAD-TEST-STRATEGY.md](docs/LOAD-TEST-STRATEGY.md)
 - k6 scripts in `tests/perf/`
 
-## Next steps (optional enhancements)
-- Request ID middleware + structured logging
-- Minimal React UI + Playwright UI tests (planned under /ui)
-- OpenAPI schema contract validation in tests
 
-
-# UIs in this repo
-
-This repo already includes two UIs served by the API gateway:
-
-- Tools UI — http://localhost:8080/ui/ (API exerciser)
-- Demo App — http://localhost:8080/demo/ (realistic UI for e2e tests)
-
-Docs:
-- UI Index: `docs/ui/INDEX.md`
-- Tools UI: `docs/ui/TOOLS-UI.md`
-- Demo App: `docs/ui/DEMO-APP.md`
-
-See also: `docs/SELECTORS-AND-BEST-PRACTICES.md` for robust selectors and waiting patterns.
+## AI usage disclaimer:
+Used copilot and chat gpt to:
+- Get the api up and running fast
+- Generate simple ui
+- Verify my own knowledge, review code, check snippets of code in different versions etc.
+- Some of the tests are also ai generated
+- Biggest usage was in all markdown files to polish and improve them before publishing.
 
 ---
 
